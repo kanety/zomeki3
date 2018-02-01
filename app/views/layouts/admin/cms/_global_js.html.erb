@@ -1,0 +1,13 @@
+<%= javascript_tag do -%>
+window.cms = {};
+window.cms.page = {
+  smart_phone: <%= Page.smart_phone? %>
+};
+window.cms.site = {
+  editor_external_urls: <%= if params[:action].in?(%w(new create edit update))
+                              Core.site.editor_external_urls.map { |url| [url] }.to_json.html_safe
+                            else
+                              []
+                            end %>
+};
+<%- end -%>

@@ -66,6 +66,10 @@ class Cms::SiteSetting < ApplicationRecord
              name: 'ZIPダウンロード最大サイズ',
              default_value: 100,
              index: true
+  set_config :editor_external_urls,
+             name: 'エディタ/外部リンク',
+             default_value: '',
+             index: true
 
   validates :site_id, presence: true
   validates :name, presence: true,

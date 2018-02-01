@@ -119,3 +119,15 @@
   </tr>
 </table>
 <%- end -%>
+
+<%- if @item.name == 'editor_external_urls' -%>
+<table class="show">
+  <tr>
+    <th><%= @site.locale :in_setting_site_editor_external_urls %></th>
+    <td>
+      <%= f.text_area :in_setting_site_editor_external_urls, size: '100x10' %>
+      <div>（改行で複数指定）</div>
+    </td>
+  </tr>
+</table>
+<%- end -%>

@@ -8,7 +8,7 @@
   <tr class="<%= cycle '', 'cycle' %>">
     <td style="text-align: center;"><%= link_to :edit, { action: :edit, id: item.name } %></td>
     <td><%= item.config[:name] %></td>
-    <td><%= item.value_name %></td>
+    <td><%= truncate(item.value_name, length: 100) %></td>
   </tr>
   <%- end -%>
 </table>

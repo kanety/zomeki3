@@ -12,7 +12,7 @@ CKEDITOR.editorConfig = function( config ) {
 
   // ツールバーの設定
   // http://docs.cksource.com/ckeditor_api/symbols/CKEDITOR.config.html#.toolbar_Full
-  if (cms && cms.Page && cms.Page.smart_phone) {
+  if (cms.page.smart_phone) {
     config.toolbar = [
       { name: 'styles',      items : [ 'Format' ] },
       { name: 'basicstyles', items : [ 'TextColor','Bold','Italic','Underline','Strike' ] },
@@ -93,6 +93,21 @@ CKEDITOR.on('dialogDefinition', function(ev){
     var infoTab = dialogDefinition.getContents('info');
     txtWidth = infoTab.get('txtWidth');
     txtWidth['default'] = '';
+  }
+  // 外部リンク表示
+  if (dialogName == 'zomekilink') {
+    var infoTab = dialogDefinition.getContents('info');
+    infoTab.add({
+      type: 'select',
+      id: 'externalUrls',
+      label: '外部リンク一覧から選択',
+      items: [['']].concat(cms.site.editor_external_urls),
+      'default': '',
+      onChange : function() {
+        var dialog = this.getDialog();
+        dialog.getContentElement('info', 'url').setValue(this.getValue());
+      }
+    });
   }
 });
 
