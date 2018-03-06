@@ -14,7 +14,7 @@ class Survey::Form < ApplicationRecord
 
   attribute :sort_no, :integer, default: 10
 
-  enum_ish :state, [:draft, :approvable, :approved, :prepared, :public, :closed], predicate: true
+  enum_ish :state, [:draft, :approvable, :approved, :prepared, :public, :closed], predicate: true, scope: true
   enum_ish :confirmation, [true, false], default: true
   enum_ish :index_link, [:visible, :hidden], default: :visible
 
@@ -36,10 +36,8 @@ class Survey::Form < ApplicationRecord
   after_save     Cms::Publisher::ContentCallbacks.new(belonged: true), if: :changed?
   before_destroy Cms::Publisher::ContentCallbacks.new(belonged: true)
 
-  scope :public_state, -> { where(state: 'public') }
-
   def public_questions
-    questions.public_state
+    questions.with_state(:public)
   end
 
   def automatic_reply?

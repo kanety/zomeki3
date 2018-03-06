@@ -8,7 +8,7 @@ class GpTemplate::Template < ApplicationRecord
 
   attribute :sort_no, :integer, default: 10
 
-  enum_ish :state, [:public, :closed], default: :public, predicate: true
+  enum_ish :state, [:public, :closed], default: :public, predicate: true, scope: true
 
   belongs_to :content, class_name: 'GpTemplate::Content::Template', required: true
 
@@ -17,10 +17,8 @@ class GpTemplate::Template < ApplicationRecord
   validates :state, presence: true
   validates :title, presence: true
 
-  scope :public_state, -> { where(state: 'public') }
-
   def public_items
-    items.public_state
+    items.with_state(:public)
   end
 
   def duplicate

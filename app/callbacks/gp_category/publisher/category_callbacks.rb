@@ -25,7 +25,7 @@ class GpCategory::Publisher::CategoryCallbacks < PublisherCallbacks
 
   def enqueue_docs
     category_ids = @category.public_descendants.map(&:id)
-    docs = GpArticle::Doc.public_state.categorized_into(category_ids).select(:id)
+    docs = GpArticle::Doc.with_state(:public).categorized_into(category_ids).select(:id)
     Cms::Publisher.register(@category.content.site_id, docs)
   end
 end

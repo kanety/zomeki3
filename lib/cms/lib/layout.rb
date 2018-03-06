@@ -31,7 +31,7 @@ module Cms::Lib::Layout
       name_array = name.split('#')
       rel = Cms::Piece.select(Cms::Piece.arel_table[Arel.star])
                       .select("#{Cms::Piece.connection.quote(name)}::text as bracket_description")
-                      .public_state.ci_match(name: name_array[0])
+                      .with_state(:public).ci_match(name: name_array[0])
                       .order(concepts_order(concepts)).limit(1)
       if name_array.size > 1 # [[piece/name#id]]
         rel.where(id: name_array[1])
@@ -56,7 +56,7 @@ module Cms::Lib::Layout
     relations = names.map do |name|
       Cms::DataText.select(Cms::DataText.arel_table[Arel.star])
                    .select("#{Cms::DataText.connection.quote(name)}::text as bracket_description")
-                   .public_state.ci_match(name: name)
+                   .with_state(:public).ci_match(name: name)
                    .where(concept_id: [nil] + concepts.to_a)
                    .order(concepts_order(concepts)).limit(1)
     end
@@ -74,7 +74,7 @@ module Cms::Lib::Layout
 
       rel = Cms::DataFile.select(Cms::DataFile.arel_table[Arel.star])
                          .select("#{Cms::DataFile.connection.quote(name)}::text as bracket_description")
-                         .public_state.ci_match(name: basename)
+                         .with_state(:public).ci_match(name: basename)
                          .where(concept_id: [nil] + concepts.to_a)
                          .order(concepts_order(concepts, table_name: Cms::DataFile.table_name)).limit(1)
       if dirname == '.'

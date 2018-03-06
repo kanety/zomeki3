@@ -29,7 +29,7 @@ class GpCategory::Public::TemplateModule::CategoryTypesController < GpCategory::
   def index_docs_1
     category_ids = @category_types.flat_map { |ct| ct.public_categories.map(&:id) }
 
-    docs = GpArticle::Doc.public_state.categorized_into(category_ids).mobile(::Page.mobile?).except(:order)
+    docs = GpArticle::Doc.with_state(:public).categorized_into(category_ids).mobile(::Page.mobile?).except(:order)
     docs = docs.where(content_id: @template_module.gp_article_content_ids) if @template_module.gp_article_content_ids.present?
     @docs = docs.order(@content.translated_docs_order)
                 .paginate(page: 1, per_page: @template_module.num_docs)

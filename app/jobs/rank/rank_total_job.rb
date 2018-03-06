@@ -43,7 +43,7 @@ class Rank::RankTotalJob < ApplicationJob
 
   def total_categories
     cc_ids = GpCategory::Content::CategoryType.where(site_id: @content.site_id).pluck(:id)
-    public_categories = GpCategory::CategoryType.public_state.where(content_id: cc_ids)
+    public_categories = GpCategory::CategoryType.with_state(:public).where(content_id: cc_ids)
                                                 .flat_map(&:public_root_categories)
                                                 .flat_map(&:public_descendants)
 
@@ -51,7 +51,7 @@ class Rank::RankTotalJob < ApplicationJob
       Rank::Category.where(content_id: @content.id).delete_all
       public_categories.each do |category|
         cats = []
-        docs = GpArticle::Doc.categorized_into(category.id).public_state
+        docs = GpArticle::Doc.categorized_into(category.id).with_state(:public)
         docs.find_each do |doc|
           cats << Rank::Category.new(content_id:  @content.id,
                                      page_path:   doc.public_uri,

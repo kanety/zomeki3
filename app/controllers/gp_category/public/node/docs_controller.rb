@@ -10,7 +10,7 @@ class GpCategory::Public::Node::DocsController < Cms::Controller::Public::Base
     categories = @content.public_category_types.inject([]) {|result, ct|
                      result | ct.public_root_categories.inject([]) {|r, c| r | c.descendants }
                    }
-    @docs = GpArticle::Doc.categorized_into(categories.map(&:id)).mobile(::Page.mobile?).public_state
+    @docs = GpArticle::Doc.categorized_into(categories.map(&:id)).mobile(::Page.mobile?).with_state(:public)
                           .order(display_published_at: :desc, published_at: :desc)
 
     if params[:format].in?(['rss', 'atom'])

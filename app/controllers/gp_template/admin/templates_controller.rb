@@ -9,10 +9,10 @@ class GpTemplate::Admin::TemplatesController < Cms::Controller::Admin::Base
 
   def index
     if params[:check_boxes]
-      @items = @content.templates.public_state
+      @items = @content.templates.with_state(:public)
       return render 'index_check_boxes', :layout => false
     elsif params[:options]
-      @items = @content.templates.public_state
+      @items = @content.templates.with_state(:public)
       return render 'index_options', :layout => false
     end
     

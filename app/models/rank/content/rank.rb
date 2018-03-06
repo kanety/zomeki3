@@ -6,7 +6,7 @@ class Rank::Content::Rank < Cms::Content
   has_many :ranks, foreign_key: :content_id, class_name: 'Rank::Total', dependent: :destroy
 
   # node
-  has_one :public_node, -> { public_state.order(:id) },
+  has_one :public_node, -> { with_state(:public).order(:id) },
                         foreign_key: :content_id, class_name: 'Cms::Node'
 
   def web_property_id

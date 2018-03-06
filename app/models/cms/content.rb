@@ -12,8 +12,8 @@ class Cms::Content < ApplicationRecord
 
   # conditional
   has_one :main_node, -> { order(:id) }, class_name: 'Cms::Node'
-  has_many :public_nodes, -> { public_state }, class_name: 'Cms::Node'
-  has_many :public_pieces, -> { public_state }, class_name: 'Cms::Piece'
+  has_many :public_nodes, -> { with_state(:public) }, class_name: 'Cms::Node'
+  has_many :public_pieces, -> { with_state(:public) }, class_name: 'Cms::Piece'
 
   validates :concept_id, :state, :model, :name, presence: true
   validates :code, presence: true,

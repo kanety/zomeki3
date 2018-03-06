@@ -3,7 +3,7 @@ class GpCalendar::Public::Node::CalendarStyledEventsController < GpCalendar::Pub
     http_error(404) if params[:page]
 
     criteria = {year_month: @date.strftime('%Y%m')}
-    @events = GpCalendar::Event.public_state.content_and_criteria(@content, criteria).order(:started_on)
+    @events = GpCalendar::Event.with_state(:public).content_and_criteria(@content, criteria).order(:started_on)
       .preload(:categories).to_a
 
     start_date = @date.beginning_of_month.beginning_of_week(:sunday)
@@ -20,7 +20,7 @@ class GpCalendar::Public::Node::CalendarStyledEventsController < GpCalendar::Pub
         next weeks
       end
 
-    @holidays = GpCalendar::Holiday.public_state.content_and_criteria(@content, criteria)
+    @holidays = GpCalendar::Holiday.with_state(:public).content_and_criteria(@content, criteria)
 
   end
 end

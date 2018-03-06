@@ -81,7 +81,7 @@ module Cms
         end
 
         def load_dynamic_dirs(site)
-          site.nodes.public_state.dynamic_models
+          site.nodes.with_state(:public).dynamic_models
               .map { |node| node.public_uri.chomp('/') }
         end
 

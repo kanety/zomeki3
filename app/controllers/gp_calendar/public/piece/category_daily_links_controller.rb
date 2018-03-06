@@ -27,7 +27,7 @@ class GpCalendar::Public::Piece::CategoryDailyLinksController < GpCalendar::Publ
 
     @calendar.day_uri   = "#{@node.public_uri}?start_date=:year-:month-:day&end_date=:year-:month-:day"
 
-    events = @piece.content.events.public_state
+    events = @piece.content.events.with_state(:public)
                    .scheduled_between(start_date, end_date)
                    .content_and_criteria(@piece.content, {categories: @piece.category_ids}).to_a
     docs = @piece.content.public_event_docs(start_date, end_date)

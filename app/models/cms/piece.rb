@@ -10,7 +10,7 @@ class Cms::Piece < ApplicationRecord
   include Cms::Model::Auth::Concept
   include Cms::Model::Base::Piece
 
-  enum_ish :state, [:public, :closed]
+  enum_ish :state, [:public, :closed], scope: true
 
   has_many :settings, -> { order(:sort_no) }, class_name: 'Cms::PieceSetting', dependent: :destroy
 
@@ -25,8 +25,6 @@ class Cms::Piece < ApplicationRecord
 
   after_save     Cms::Publisher::PieceCallbacks.new, if: :changed?
   before_destroy Cms::Publisher::PieceCallbacks.new
-
-  scope :public_state, -> { where(state: 'public') }
 
   def owner_layouts
     Cms::Layout.where(id: bracketees.select(:owner_id).where(owner_type: 'Cms::Layout'))

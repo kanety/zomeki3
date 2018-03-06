@@ -7,7 +7,7 @@ class Organization::Public::Piece::AllGroupsController < Sys::Controller::Public
   end
 
   def index
-    @groups = @piece.content.top_layer_groups.public_state
+    @groups = @piece.content.top_layer_groups.with_state(:public)
     @groups = Cms::ContentsPreloader.new(@groups).preload(:public_node_ancestors)
   end
 end

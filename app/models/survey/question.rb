@@ -6,7 +6,7 @@ class Survey::Question < ApplicationRecord
 
   attribute :sort_no, :integer, default: 10
 
-  enum_ish :state, [:public, :closed], default: :public
+  enum_ish :state, [:public, :closed], default: :public, scope: true
   enum_ish :form_type, [:text_field, :text_field_email, :text_area,
                         :select, :radio_button, :check_box, :attachment, :free], default: :text_field
   enum_ish :required, [true, false], default: true
@@ -21,8 +21,6 @@ class Survey::Question < ApplicationRecord
   validates :sort_no, presence: true
 
   nested_scope :in_site, through: :form
-
-  scope :public_state, -> { where(state: 'public') }
 
   def form_options_for_select
     form_options.gsub("\r\n", "\n").gsub("\r", "\n").split("\n")

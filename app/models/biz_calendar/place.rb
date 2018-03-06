@@ -7,7 +7,7 @@ class BizCalendar::Place < ApplicationRecord
 
   attribute :sort_no, :integer, default: 10
 
-  enum_ish :state, [:public, :closed], default: :public, predicate: true
+  enum_ish :state, [:public, :closed], default: :public, predicate: true, scope: true
   enum_ish :business_hours_state, [:visible, :hidden], default: :visible
   enum_ish :business_holiday_state, [:visible, :hidden], default: :visible
 
@@ -24,7 +24,6 @@ class BizCalendar::Place < ApplicationRecord
   after_save     Cms::Publisher::ContentCallbacks.new(belonged: true), if: :changed?
   before_destroy Cms::Publisher::ContentCallbacks.new(belonged: true)
 
-  scope :public_state, -> { where(state: 'public') }
   scope :search_with_params, ->(params = {}) {
     rel = all
     params.each do |n, v|
@@ -53,7 +52,7 @@ class BizCalendar::Place < ApplicationRecord
 
     where2 = where2.and(end_type_rel)
 
-    _hours =  hours.public_state.where(hour.grouping(where1).or(hour.grouping(where2))).all
+    _hours =  hours.with_state(:public).where(hour.grouping(where1).or(hour.grouping(where2))).all
 
     date_hours = []
     _hours.each do |h|
@@ -78,10 +77,10 @@ class BizCalendar::Place < ApplicationRecord
   end
 
   def next_holiday(sdate=Date.today)
-    return '' if holidays.public_state.blank?
+    return '' if holidays.with_state(:public).blank?
     next_holiday = nil
 
-    self.holidays.public_state.each do |h|
+    self.holidays.with_state(:public).each do |h|
       if h.repeat_type.blank?
         next if h.holiday_end_date < sdate
       elsif !h.repeat_type.blank? && h.end_type == 2

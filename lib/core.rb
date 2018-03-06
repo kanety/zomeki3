@@ -137,7 +137,7 @@ class Core
         current = Cms::Node.find(Page.site.node_id)
       else
         arel = Cms::Node.where(site_id: Page.site.id, parent_id: node.id, name: paths[i])
-        arel = arel.public_state unless @@mode == 'preview'
+        arel = arel.with_state(:public) unless @@mode == 'preview'
         current = arel.order(:id).first
       end
       break unless current

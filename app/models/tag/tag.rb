@@ -46,7 +46,7 @@ class Tag::Tag < ApplicationRecord
   end
 
   def public_docs
-    docs.mobile(::Page.mobile?).public_state
+    docs.mobile(::Page.mobile?).with_state(:public)
   end
 
   def update_last_tagged_at(doc=nil)

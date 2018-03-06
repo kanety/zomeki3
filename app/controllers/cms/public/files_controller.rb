@@ -8,7 +8,7 @@ class Cms::Public::FilesController < Cms::Controller::Public::Data
     type  = paths.size == 3 ? paths[1] : nil
     return http_error(404) if id !~ /^[0-9]+$/
 
-    item = Cms::DataFile.public_state.where(id: id.chop, name: name).first
+    item = Cms::DataFile.with_state(:public).where(id: id.chop, name: name).first
     return http_error(404) unless item
 
     path = item.public_path

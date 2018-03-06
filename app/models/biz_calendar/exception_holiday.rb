@@ -3,7 +3,7 @@ class BizCalendar::ExceptionHoliday < ApplicationRecord
   include Sys::Model::Rel::Creator
   include Cms::Model::Auth::Content
 
-  enum_ish :state, [:public, :closed], default: :public, predicate: true
+  enum_ish :state, [:public, :closed], default: :public, predicate: true, scope: true
 
   belongs_to :place, class_name: 'BizCalendar::Place'
 
@@ -17,7 +17,6 @@ class BizCalendar::ExceptionHoliday < ApplicationRecord
 
   nested_scope :in_site, through: :place
 
-  scope :public_state, ->{ where(state: 'public') }
   scope :search_with_params, ->(params = {}) {
     rel = all
     params.each do |n, v|

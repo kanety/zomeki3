@@ -6,7 +6,7 @@ class BizCalendar::BussinessHoliday < ApplicationRecord
 
   REPEAT_WEEK_OPTIONS = [['月', 'mon'], ['火', 'tue'], ['水', 'wed'], ['木', 'thurs'], ['金', 'fri'], ['土', 'sat'],['日', 'sun']]
 
-  enum_ish :state, [:public, :closed], default: :public, predicate: true
+  enum_ish :state, [:public, :closed], default: :public, predicate: true, scope: true
   enum_ish :repeat_type, [:daily, :weekday, :saturdays, :holiday, :weekly, :monthly, :yearly]
   enum_ish :repeat_criterion, [:day, :week]
   enum_ish :end_type, [0, 1, 2], default: 0
@@ -28,7 +28,6 @@ class BizCalendar::BussinessHoliday < ApplicationRecord
 
   nested_scope :in_site, through: :place
 
-  scope :public_state, -> { where(state: 'public') }
   scope :search_with_params, ->(params = {}) {
     rel = all
     params.each do |n, v|

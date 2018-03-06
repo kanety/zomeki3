@@ -8,7 +8,7 @@ class GpCategory::Category < ApplicationRecord
 
   default_scope { order(category_type_id: :asc, parent_id: :asc, level_no: :asc, sort_no: :asc, name: :asc) }
 
-  enum_ish :state, [:public, :closed], default: :public, predicate: true
+  enum_ish :state, [:public, :closed], default: :public, predicate: true, scope: true
   enum_ish :docs_order, ['',
                          'display_published_at DESC, published_at DESC',
                          'display_published_at ASC, published_at ASC',
@@ -45,7 +45,7 @@ class GpCategory::Category < ApplicationRecord
   belongs_to :group, :foreign_key => :group_code, :class_name => 'Sys::Group'
 
   # conditional associations
-  has_many :public_children, -> { public_state },
+  has_many :public_children, -> { with_state(:public) },
     :foreign_key => :parent_id, :class_name => self.name
 
   delegate :content, to: :category_type
@@ -58,7 +58,6 @@ class GpCategory::Category < ApplicationRecord
   before_destroy GpCategory::Publisher::CategoryCallbacks.new
 
   scope :with_root, -> { where(parent_id: nil) }
-  scope :public_state, -> { where(state: 'public') }
 
   after_update :move_published_files
   after_destroy :clean_published_files
@@ -139,7 +138,7 @@ class GpCategory::Category < ApplicationRecord
   end
 
   def public_docs
-    docs.order(inherited_docs_order).mobile(::Page.mobile?).public_state
+    docs.order(inherited_docs_order).mobile(::Page.mobile?).with_state(:public)
   end
 
   def public_path
@@ -237,7 +236,7 @@ class GpCategory::Category < ApplicationRecord
                      when 'docs_2', 'docs_4', 'docs_6'
                        [category.id]
                      end
-      docs = GpArticle::Doc.categorized_into(category_ids).except(:order).mobile(mobile).public_state
+      docs = GpArticle::Doc.categorized_into(category_ids).except(:order).mobile(mobile).with_state(:public)
       docs = docs.where(content_id: template_module.gp_article_content_ids) if template_module.gp_article_content_ids.present?
       docs
     end

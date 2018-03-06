@@ -26,7 +26,7 @@ class GpCategory::Public::Piece::RecentTabsController < Sys::Controller::Public:
         else
           GpArticle::Doc
         end
-      docs = docs.mobile(::Page.mobile?).public_state.where(content_id: content_ids)
+      docs = docs.mobile(::Page.mobile?).with_state(:public).where(content_id: content_ids)
                  .order(display_published_at: :desc, published_at: :desc)
                  .limit(@piece.list_count)
       docs = GpArticle::DocsPreloader.new(docs).preload(:public_node_ancestors)

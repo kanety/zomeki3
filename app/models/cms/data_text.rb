@@ -6,7 +6,7 @@ class Cms::DataText < ApplicationRecord
   include Cms::Model::Rel::Bracketee
   include Cms::Model::Auth::Concept::Creator
 
-  enum_ish :state, [:public, :closed]
+  enum_ish :state, [:public, :closed], scope: true
 
   belongs_to :concept
 
@@ -17,6 +17,4 @@ class Cms::DataText < ApplicationRecord
   validates :name, presence: true,
                    uniqueness: { scope: :concept_id, case_sensitive: false },
                    format: { with: /\A[0-9a-zA-Z\-_]+\z/, if: -> { name.present? }, message: :invalid_bracket_name }
-
-  scope :public_state, -> { where(state: 'public') }
 end

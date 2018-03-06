@@ -9,7 +9,7 @@ class GpCalendar::Holiday < ApplicationRecord
   # Not saved to database
   attr_accessor :doc
 
-  enum_ish :state, [:public, :closed], default: :public
+  enum_ish :state, [:public, :closed], default: :public, scope: true
   enum_ish :kind, [:holiday, :event], default: :holiday
 
   # Content
@@ -22,8 +22,6 @@ class GpCalendar::Holiday < ApplicationRecord
 
   validates :state, presence: true
   validates :title, presence: true
-
-  scope :public_state, -> { where(state: 'public') }
 
   scope :content_and_criteria, ->(content, criteria){
     holidays = self.arel_table
@@ -74,7 +72,7 @@ class GpCalendar::Holiday < ApplicationRecord
 
   def holiday
     criteria = {date: started_on, kind: 'holiday'}
-    GpCalendar::Holiday.public_state.content_and_criteria(content, criteria).first.try(:title)
+    GpCalendar::Holiday.with_state(:public).content_and_criteria(content, criteria).first.try(:title)
   end
 
   private

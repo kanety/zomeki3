@@ -6,13 +6,13 @@ class Reception::Course < ApplicationRecord
   include Cms::Model::Auth::Content
   include GpCategory::Model::Rel::Category
 
-  enum_ish :state, [:draft, :public, :closed], default: :public, predicate: true
+  enum_ish :state, [:draft, :public, :closed], default: :public, predicate: true, scope: true
 
   # Content
   belongs_to :content, class_name: 'Reception::Content::Course', required: true
 
   has_many :opens, -> { order_by_open_at }, dependent: :destroy
-  has_many :public_opens, -> { public_state.order_by_open_at }, class_name: 'Reception::Open'
+  has_many :public_opens, -> { with_state(:public).order_by_open_at }, class_name: 'Reception::Open'
 
   after_save :set_name
 
@@ -22,7 +22,6 @@ class Reception::Course < ApplicationRecord
   validates :title, presence: true
   validates :name, exclusion: { in: %w(categories) }
 
-  scope :public_state, -> { where(state: 'public') }
   scope :with_target, ->(target) { target.present? ? where(state: target) : all }
   scope :search_with_criteria, ->(criteria) {
     rel = all
@@ -33,7 +32,7 @@ class Reception::Course < ApplicationRecord
   scope :has_public_opens, -> {
     distinct.joins(:opens)
             .where(state: 'public')
-            .merge(Reception::Open.public_state)
+            .merge(Reception::Open.with_state(:public))
   }
   scope :has_available_opens, -> {
     distinct.joins(:opens)
@@ -62,7 +61,7 @@ class Reception::Course < ApplicationRecord
 
   def applicable_opens
     opens.joins(:course)
-         .merge(Reception::Open.public_state)
+         .merge(Reception::Open.with_state(:public))
          .merge(Reception::Open.available_period)
          .merge(Reception::Open.within_capacity)
   end
@@ -86,7 +85,7 @@ class Reception::Course < ApplicationRecord
     crumbs = []
 
     if content.doc_list_style == 'all_categories'
-      categories.public_state.each do |category|
+      categories.with_state(:public).each do |category|
         category_type = category.category_type
         if (node = content.public_node)
           crumb = node.bread_crumbs.crumbs.first

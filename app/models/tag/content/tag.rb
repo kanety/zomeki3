@@ -6,7 +6,7 @@ class Tag::Content::Tag < Cms::Content
                   foreign_key: :content_id, class_name: 'Tag::Tag', dependent: :destroy
 
   # node
-  has_one :public_node, -> { public_state.where(model: 'Tag::Tag').order(:id) },
+  has_one :public_node, -> { with_state(:public).where(model: 'Tag::Tag').order(:id) },
                         foreign_key: :content_id, class_name: 'Cms::Node'
 
   def public_path

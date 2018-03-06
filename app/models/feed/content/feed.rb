@@ -6,7 +6,7 @@ class Feed::Content::Feed < Cms::Content
   has_many :entries, foreign_key: :content_id, class_name: 'Feed::FeedEntry', dependent: :destroy
 
   # node
-  has_one :public_node, -> { public_state.where(model: 'Feed::FeedEntry').order(:id) },
+  has_one :public_node, -> { with_state(:public).where(model: 'Feed::FeedEntry').order(:id) },
                         foreign_key: :content_id, class_name: 'Cms::Node'
 
   def public_entries

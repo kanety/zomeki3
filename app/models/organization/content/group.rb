@@ -8,7 +8,7 @@ class Organization::Content::Group < Cms::Content
   has_many :groups, foreign_key: :content_id, class_name: 'Organization::Group', dependent: :destroy
 
   # node
-  has_one :public_node, -> { public_state.where(model: 'Organization::Group').order(:id) },
+  has_one :public_node, -> { with_state(:public).where(model: 'Organization::Group').order(:id) },
                         foreign_key: :content_id, class_name: 'Cms::Node'
 
   def top_layer_sys_groups
@@ -24,7 +24,7 @@ class Organization::Content::Group < Cms::Content
   end
 
   def public_top_layer_groups
-    top_layer_groups.public_state
+    top_layer_groups.with_state(:public)
   end
 
   def find_group_by_path_from_root(path_from_root)
@@ -111,7 +111,7 @@ class Organization::Content::Group < Cms::Content
   end
 
   def public_docs
-    GpArticle::Doc.mobile(::Page.mobile?).public_state
+    GpArticle::Doc.mobile(::Page.mobile?).with_state(:public)
                   .where(content_id: article_contents.pluck(:id))
   end
 end

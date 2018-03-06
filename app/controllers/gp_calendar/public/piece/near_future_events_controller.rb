@@ -10,7 +10,7 @@ class GpCalendar::Public::Piece::NearFutureEventsController < GpCalendar::Public
     today = Date.today
     tomorrow = today.tomorrow
 
-    events = @piece.content.events.public_state.scheduled_between(today, tomorrow)
+    events = @piece.content.events.with_state(:public).scheduled_between(today, tomorrow)
     @todays_events = events.select {|ev| ev.started_on <= today && today <= ev.ended_on }
     @tomorrows_events = events.select {|ev| ev.started_on <= tomorrow && tomorrow <= ev.ended_on }
 

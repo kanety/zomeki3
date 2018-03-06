@@ -2,7 +2,7 @@ class Cms::NodesScript < PublicationScript
   def publish
     @ids = {}
 
-    nodes = Cms::Node.public_state.order(:name, :id)
+    nodes = Cms::Node.with_state(:public).order(:name, :id)
     nodes.where!(site_id: ::Script.site.id) if ::Script.site
 
     if params.key?(:target_node_id)

@@ -9,11 +9,11 @@ class GpArticle::Content::Doc < Cms::Content
   # node
   has_one :main_node, -> { where(model: 'GpArticle::Doc').order(:id) },
                       foreign_key: :content_id, class_name: 'Cms::Node'
-  has_one :public_node, -> { public_state.where(model: 'GpArticle::Doc').order(:id) },
+  has_one :public_node, -> { with_state(:public).where(model: 'GpArticle::Doc').order(:id) },
                         foreign_key: :content_id, class_name: 'Cms::Node'
-  has_one :public_archives_node, -> { public_state.where(model: 'GpArticle::Archive').order(:id) },
+  has_one :public_archives_node, -> { with_state(:public).where(model: 'GpArticle::Archive').order(:id) },
                                  foreign_key: :content_id, class_name: 'Cms::Node'
-  has_one :public_search_docs_node, -> { public_state.where(model: 'GpArticle::SearchDoc').order(:id) },
+  has_one :public_search_docs_node, -> { with_state(:public).where(model: 'GpArticle::SearchDoc').order(:id) },
                                     foreign_key: :content_id, class_name: 'Cms::Node'
 
   # draft, approvable, approved, public
@@ -24,7 +24,7 @@ class GpArticle::Content::Doc < Cms::Content
 
   # public
   def public_docs
-    docs.mobile(::Page.mobile?).public_state
+    docs.mobile(::Page.mobile?).with_state(:public)
   end
 
   def public_docs_for_list

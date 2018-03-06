@@ -34,7 +34,7 @@ class GpCalendar::Public::Piece::DailyLinksController < GpCalendar::Public::Piec
              dates | (doc.event_started_on..doc.event_ended_on).to_a
            end
 
-    events = @piece.content.events.public_state.scheduled_between(start_date, end_date)
+    events = @piece.content.events.with_state(:public).scheduled_between(start_date, end_date)
 
     (start_date..end_date).each do |date|
       if events.detect {|e| e.started_on <= date && date <= e.ended_on }

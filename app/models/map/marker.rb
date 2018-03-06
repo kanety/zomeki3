@@ -9,7 +9,7 @@ class Map::Marker < ApplicationRecord
 
   attribute :sort_no, :integer, default: 10
 
-  enum_ish :state, [:public, :closed], default: :public
+  enum_ish :state, [:public, :closed], default: :public, scope: true
 
   # Content
   belongs_to :content, class_name: 'Map::Content::Marker', required: true
@@ -26,8 +26,6 @@ class Map::Marker < ApplicationRecord
 
   after_save     Cms::Publisher::ContentCallbacks.new(belonged: true), if: :changed?
   before_destroy Cms::Publisher::ContentCallbacks.new(belonged: true)
-
-  scope :public_state, -> { where(state: 'public') }
 
   def public_uri
     return '' unless content.public_node

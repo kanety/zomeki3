@@ -17,7 +17,7 @@ class GpCalendar::Public::Piece::EventsController < GpCalendar::Public::Piece::B
     end
 
     criteria = {}
-    events = GpCalendar::Event.public_state.content_and_criteria(@piece.content, criteria).order(:started_on)
+    events = GpCalendar::Event.with_state(:public).content_and_criteria(@piece.content, criteria).order(:started_on)
       .scheduled_between(start_date, end_date)
     events = events.limit(@piece.docs_number) if @piece.docs_number
     @events =  events.preload(:categories).to_a

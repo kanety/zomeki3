@@ -11,7 +11,7 @@ class GpCalendar::Event < ApplicationRecord
   # Not saved to database
   attr_accessor :doc
 
-  enum_ish :state, [:public, :closed], default: :public
+  enum_ish :state, [:public, :closed], default: :public, scope: true
   enum_ish :target, [:_self, :_blank], default: :_self
 
   # Content
@@ -31,7 +31,6 @@ class GpCalendar::Event < ApplicationRecord
 
   validate :dates_range
 
-  scope :public_state, -> { where(state: 'public') }
   scope :scheduled_between, ->(start_date, end_date) {
     dates_intersects(:started_on, :ended_on, start_date.try(:beginning_of_day), end_date.try(:end_of_day))
   }
@@ -86,7 +85,7 @@ class GpCalendar::Event < ApplicationRecord
   def holiday
     return nil unless started_on
     criteria = {date: started_on, kind: 'holiday'}
-    GpCalendar::Holiday.public_state.content_and_criteria(content, criteria).first.try(:title)
+    GpCalendar::Holiday.with_state(:public).content_and_criteria(content, criteria).first.try(:title)
   end
 
   def public_path

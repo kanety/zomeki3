@@ -67,7 +67,7 @@ namespace ZomekiCMS::NAME do
       task :rebuild => :environment do
         Cms::Site.order(:id).each do |site|
           Sys::Publisher.in_site(site).delete_all
-          node_ids = Cms::Node.public_state.rebuildable_models
+          node_ids = Cms::Node.with_state(:public).rebuildable_models
                               .where(site_id: site.id)
                               .pluck(:id)
           Cms::RebuildJob.perform_later(site_id: site.id, target_node_ids: node_ids)

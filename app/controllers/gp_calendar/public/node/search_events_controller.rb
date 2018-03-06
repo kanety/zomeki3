@@ -14,7 +14,7 @@ class GpCalendar::Public::Node::SearchEventsController < GpCalendar::Public::Nod
 
     categories = params[:categories].present? ? params[:categories].values.reject(&:blank?) : []
     criteria = {}
-    @events = GpCalendar::Event.public_state.content_and_criteria(@content, criteria).order(:started_on)
+    @events = GpCalendar::Event.with_state(:public).content_and_criteria(@content, criteria).order(:started_on)
       .scheduled_between(@start_date, @end_date)
       .preload(:categories).to_a
     categories.each do |category|
@@ -24,7 +24,7 @@ class GpCalendar::Public::Node::SearchEventsController < GpCalendar::Public::Nod
     docs = @content.public_event_docs(@start_date, @end_date, categories)
     @events = merge_docs_into_events(docs, @events)
 
-    @holidays = GpCalendar::Holiday.public_state.content_and_criteria(@content, criteria).where(kind: :event)
+    @holidays = GpCalendar::Holiday.with_state(:public).content_and_criteria(@content, criteria).where(kind: :event)
     @holidays.each do |holiday|
       holiday.started_on = @date.year
       @events << holiday if holiday.started_on

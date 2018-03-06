@@ -4,7 +4,7 @@ class Reception::Open < ApplicationRecord
   include Sys::Model::Rel::Task
   include Cms::Model::Auth::Content
 
-  enum_ish :state, [:draft, :public, :closed], default: :public, predicate: true
+  enum_ish :state, [:draft, :public, :closed], default: :public, predicate: true, scope: true
 
   belongs_to :course
   has_many :applicants, dependent: :destroy
@@ -23,7 +23,6 @@ class Reception::Open < ApplicationRecord
 
   nested_scope :in_site, through: :course
 
-  scope :public_state, -> { where(state: 'public' ) }
   scope :order_by_open_at, -> { order(:open_on, :start_at, :end_at) }
   scope :available_period, ->(time = Time.now) {
     where([

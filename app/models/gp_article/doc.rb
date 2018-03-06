@@ -44,7 +44,7 @@ class GpArticle::Doc < ApplicationRecord
   attribute :body_more_link_text, :string, default: '続きを読む'
   attribute :filename_base, :string, default: 'index'
 
-  enum_ish :state, [:draft, :approvable, :approved, :prepared, :public, :closed, :archived], predicate: true
+  enum_ish :state, [:draft, :approvable, :approved, :prepared, :public, :closed, :archived], predicate: true, scope: true
   enum_ish :target, ['', '_self', '_blank', 'attached_file'], default: ''
   enum_ish :event_state, [:visible, :hidden], default: :hidden
   enum_ish :marker_state, [:visible, :hidden], default: :hidden
@@ -126,7 +126,6 @@ class GpArticle::Doc < ApplicationRecord
   validates_with Cms::ContentNodeValidator, if: -> { state_public? },
                                            message: '記事コンテンツのディレクトリが作成されていないため、即時公開が行えません。'
 
-  scope :public_state, -> { where(state: 'public') }
   scope :mobile, ->(m) { m ? where(terminal_mobile: true) : where(terminal_pc_or_smart_phone: true) }
   scope :display_published_after, ->(date) { where(arel_table[:display_published_at].gteq(date)) }
   scope :visible_in_list, -> { where(feature_1: true) }
@@ -223,7 +222,7 @@ class GpArticle::Doc < ApplicationRecord
   def bread_crumbs(doc_node)
     crumbs = []
 
-    categories.public_state.each do |category|
+    categories.with_state(:public).each do |category|
       category_type = category.category_type
       if (node = category.content.public_node)
         crumb = node.bread_crumbs.crumbs.first

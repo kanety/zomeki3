@@ -10,7 +10,7 @@ class Cms::Admin::Tool::RebuildController < Cms::Controller::Admin::Base
                             .where(site_id: Core.site.id)
                             .where(Cms::Node.arel_table[:state].eq('public'))
                             .order(:name)
-    @nodes = Cms::Node.public_state.rebuildable_models
+    @nodes = Cms::Node.with_state(:public).rebuildable_models
                       .where(site_id: Core.site.id)
                       .preload(:site, parent: { parent: { parent: nil } })
                       .sort_by { |n| n.public_uri }

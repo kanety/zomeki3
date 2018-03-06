@@ -12,7 +12,7 @@ class Cms::Node < ApplicationRecord
   include Cms::Model::Auth::Concept
   include Cms::Model::Base::Node
 
-  enum_ish :state, [:draft, :recognize, :recognized, :public, :closed]
+  enum_ish :state, [:draft, :recognize, :recognized, :public, :closed], scope: true
 
   belongs_to :parent, class_name: self.name
   belongs_to :route, class_name: self.name
@@ -22,9 +22,9 @@ class Cms::Node < ApplicationRecord
   has_many :children_in_route, -> { sitemap_order }, foreign_key: :route_id, class_name: self.name, dependent: :destroy
 
   # conditional associations
-  has_many :public_children, -> { public_state.sitemap_order },
+  has_many :public_children, -> { with_state(:public).sitemap_order },
                             foreign_key: :parent_id, class_name: self.name
-  has_many :public_children_for_sitemap, -> { public_state.visible_in_sitemap.sitemap_order },
+  has_many :public_children_for_sitemap, -> { with_state(:public).visible_in_sitemap.sitemap_order },
                                          foreign_key: :route_id, class_name: self.name
 
   validates :parent_id, :state, :model, :title, presence: true
@@ -46,7 +46,6 @@ class Cms::Node < ApplicationRecord
   after_publish_files Cms::FileTransferCallbacks.new([:public_path, :public_smart_phone_path])
   after_close_files Cms::FileTransferCallbacks.new([:public_path, :public_smart_phone_path])
 
-  scope :public_state, -> { where(state: 'public') }
   scope :sitemap_order, -> { order('sitemap_sort_no IS NULL, sitemap_sort_no, name') }
   scope :rebuildable_models, -> { where(model: ['Cms::Page', 'Cms::Sitemap']) }
   scope :dynamic_models, -> {

@@ -7,7 +7,7 @@ class GpCalendar::Public::Node::EventsController < GpCalendar::Public::Node::Bas
     year_month = @year_only ? @date.strftime('%Y') : @date.strftime('%Y%m')
 
     criteria = {year_month: year_month}
-    @events = GpCalendar::Event.public_state.content_and_criteria(@content, criteria).order(:started_on)
+    @events = GpCalendar::Event.with_state(:public).content_and_criteria(@content, criteria).order(:started_on)
       .preload(:categories).to_a
 
     start_date, end_date = if @year_only
@@ -22,7 +22,7 @@ class GpCalendar::Public::Node::EventsController < GpCalendar::Public::Node::Bas
     docs = @content.public_event_docs(start_date, end_date)
     @events = merge_docs_into_events(docs, @events)
 
-    @holidays = GpCalendar::Holiday.public_state.content_and_criteria(@content, criteria).where(kind: :event)
+    @holidays = GpCalendar::Holiday.with_state(:public).content_and_criteria(@content, criteria).where(kind: :event)
     @holidays.each do |holiday|
       holiday.started_on = @date.year
       @events << holiday if holiday.started_on

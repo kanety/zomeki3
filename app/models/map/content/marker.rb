@@ -6,11 +6,11 @@ class Map::Content::Marker < Cms::Content
   has_many :marker_icons, foreign_key: :content_id, class_name: 'Map::MarkerIcon', dependent: :destroy
 
   # node
-  has_one :public_node, -> { public_state.where(model: 'Map::Marker').order(:id) },
+  has_one :public_node, -> { with_state(:public).where(model: 'Map::Marker').order(:id) },
                         foreign_key: :content_id, class_name: 'Cms::Node'
 
   def public_markers
-    markers.public_state
+    markers.with_state(:public)
   end
 
   def default_map_position
@@ -28,7 +28,7 @@ class Map::Content::Marker < Cms::Content
   end
 
   def public_categories
-    categories.public_state
+    categories.with_state(:public)
   end
 
   def category_types
@@ -114,7 +114,7 @@ class Map::Content::Marker < Cms::Content
     if doc_content_ids.blank?
       GpArticle::Doc.none
     else
-      docs = GpArticle::Doc.distinct.joins(maps: :markers).mobile(::Page.mobile?).public_state
+      docs = GpArticle::Doc.distinct.joins(maps: :markers).mobile(::Page.mobile?).with_state(:public)
                            .where(content_id: doc_content_ids, marker_state: 'visible')
       if specified_category
         cat_ids = GpCategory::Categorization.select(:categorizable_id)

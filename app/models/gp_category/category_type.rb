@@ -10,7 +10,7 @@ class GpCategory::CategoryType < ApplicationRecord
 
   attribute :sort_no, :integer, default: 10
 
-  enum_ish :state, [:public, :closed], default: :public, predicate: true
+  enum_ish :state, [:public, :closed], default: :public, predicate: true, scope: true
   enum_ish :docs_order, ['',
                          'display_published_at DESC, published_at DESC',
                          'display_published_at ASC, published_at ASC',
@@ -32,9 +32,9 @@ class GpCategory::CategoryType < ApplicationRecord
   # conditional associations
   has_many :root_categories, -> { with_root },
     :foreign_key => :category_type_id, :class_name => 'GpCategory::Category'
-  has_many :public_categories, -> { public_state },
+  has_many :public_categories, -> { with_state(:public) },
     :foreign_key => :category_type_id, :class_name => 'GpCategory::Category'
-  has_many :public_root_categories, -> { public_state.with_root },
+  has_many :public_root_categories, -> { with_state(:public).with_root },
     :foreign_key => :category_type_id, :class_name => 'GpCategory::Category'
 
   validates :name, presence: true, uniqueness: { scope: :content_id },
@@ -44,8 +44,6 @@ class GpCategory::CategoryType < ApplicationRecord
 
   after_save     GpCategory::Publisher::CategoryTypeCallbacks.new, if: :changed?
   before_destroy GpCategory::Publisher::CategoryTypeCallbacks.new
-
-  scope :public_state, -> { where(state: 'public') }
 
   after_destroy :clean_published_files
 
@@ -126,7 +124,7 @@ class GpCategory::CategoryType < ApplicationRecord
                      else
                        []
                      end
-      docs = GpArticle::Doc.categorized_into(category_ids).except(:order).mobile(mobile).public_state
+      docs = GpArticle::Doc.categorized_into(category_ids).except(:order).mobile(mobile).with_state(:public)
       docs = docs.where(content_id: template_module.gp_article_content_ids) if template_module.gp_article_content_ids.present?
       docs
     end

@@ -1,6 +1,6 @@
 <%- return '' unless defined?(template) && defined?(template_values) -%>
 
-<%- template.items.public_state.each do |item| -%>
+<%- template.items.with_state(:public).each do |item| -%>
   <%- if item.item_type == 'rich_text' -%>
   <table class="show">
     <tr>

@@ -6,7 +6,7 @@ class AdBanner::Content::Banner < Cms::Content
   has_many :groups, foreign_key: :content_id, class_name: 'AdBanner::Group', dependent: :destroy
 
   # node
-  has_one :public_node, -> { public_state.where(model: 'AdBanner::Banner').order(:id) },
+  has_one :public_node, -> { with_state(:public).where(model: 'AdBanner::Banner').order(:id) },
                         foreign_key: :content_id, class_name: 'Cms::Node'
 
   def groups_for_option

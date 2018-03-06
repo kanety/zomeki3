@@ -10,7 +10,7 @@ class Organization::Group < ApplicationRecord
 
   attribute :sort_no, :integer, default: 10
 
-  enum_ish :state, [:public, :closed], default: :public, predicate: true
+  enum_ish :state, [:public, :closed], default: :public, predicate: true, scope: true
   enum_ish :docs_order, ['',
                          'display_published_at DESC, published_at DESC',
                          'display_published_at ASC, published_at ASC',
@@ -32,7 +32,6 @@ class Organization::Group < ApplicationRecord
   validates :name, presence: true, format: /\A[0-9A-Za-z\._-]*\z/i
   validate :name_uniqueness_in_siblings
 
-  scope :public_state, -> { where(state: 'public') }
   scope :with_layout, ->(layout_ids) {
     conds = [:layout_id, :more_layout_id].map { |c| arel_table[c].in(layout_ids) }
     where(conds.reduce(:or))
@@ -52,7 +51,7 @@ class Organization::Group < ApplicationRecord
   end
 
   def public_children
-    children.public_state
+    children.with_state(:public)
   end
 
   def public_uri

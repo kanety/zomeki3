@@ -7,7 +7,7 @@ class Cms::DataFile < ApplicationRecord
   include Cms::Model::Rel::Bracketee
   include Cms::Model::Auth::Concept::Creator
 
-  enum_ish :state, [:public, :closed]
+  enum_ish :state, [:public, :closed], scope: true
 
   belongs_to :concept
   belongs_to :node, class_name: 'Cms::DataFileNode'
@@ -17,8 +17,6 @@ class Cms::DataFile < ApplicationRecord
 
   after_save     Cms::SearchIndexerCallbacks.new, if: :changed?
   before_destroy Cms::SearchIndexerCallbacks.new
-
-  scope :public_state, -> { where(state: 'public') }
 
   def self.find_by_public_path(path)
     site_id, id, name = path.match(%r!/sites[/\d]*/(\d+)/public/_files/(\d+)/(.+)\z!i).captures

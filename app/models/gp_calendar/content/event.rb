@@ -6,17 +6,17 @@ class GpCalendar::Content::Event < Cms::Content
   has_many :holidays, foreign_key: :content_id, class_name: 'GpCalendar::Holiday', dependent: :destroy
 
   # node
-  has_one :public_node, -> { public_state.order(:id) },
+  has_one :public_node, -> { with_state(:public).order(:id) },
                         foreign_key: :content_id, class_name: 'Cms::Node'
 
   after_create :create_default_holidays
 
   def public_events
-    events.public_state
+    events.with_state(:public)
   end
 
   def public_holidays
-    holidays.public_state
+    holidays.with_state(:public)
   end
 
   def piece_target_nodes
@@ -33,7 +33,7 @@ class GpCalendar::Content::Event < Cms::Content
   end
 
   def public_category_types
-    category_types.public_state
+    category_types.with_state(:public)
   end
 
   def category_type_categories(category_type)
@@ -101,7 +101,7 @@ class GpCalendar::Content::Event < Cms::Content
     if doc_content_ids.blank?
       GpArticle::Doc.none
     else
-      GpArticle::Doc.mobile(::Page.mobile?).public_state
+      GpArticle::Doc.mobile(::Page.mobile?).with_state(:public)
                     .where(content_id: doc_content_ids, event_state: 'visible')
                     .event_scheduled_between(start_date, end_date, categories)
     end
