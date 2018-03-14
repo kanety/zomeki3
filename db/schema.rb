@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180227094107) do
+ActiveRecord::Schema.define(version: 20180314004355) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -511,6 +511,18 @@ ActiveRecord::Schema.define(version: 20180227094107) do
     t.string   "url"
   end
 
+  create_table "cms_ogps", force: :cascade do |t|
+    t.string   "taggable_type"
+    t.integer  "taggable_id"
+    t.string   "og_type"
+    t.string   "title"
+    t.text     "description"
+    t.string   "image"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.index ["taggable_type", "taggable_id"], name: "index_cms_ogps_on_taggable_type_and_taggable_id", using: :btree
+  end
+
   create_table "cms_piece_link_items", force: :cascade do |t|
     t.integer  "piece_id",   null: false
     t.string   "state"
@@ -537,7 +549,7 @@ ActiveRecord::Schema.define(version: 20180227094107) do
 
   create_table "cms_pieces", force: :cascade do |t|
     t.integer  "concept_id"
-    t.integer  "site_id",                     null: false
+    t.integer  "site_id",        null: false
     t.string   "state"
     t.datetime "created_at"
     t.datetime "updated_at"

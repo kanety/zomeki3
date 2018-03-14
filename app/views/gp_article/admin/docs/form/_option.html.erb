@@ -40,26 +40,7 @@
   </tr>
 </table>
 
-<p class="form">OGP</p>
-
-<table class="show">
-  <tr>
-    <th><%= f.label :og_type %></th>
-    <td><%= f.select :og_type, @item.class.og_type_options, include_blank: true %></td>
-  </tr>
-  <tr>
-    <th><%= f.label :og_title %></th>
-    <td><%= f.text_field :og_title %></td>
-  </tr>
-  <tr>
-    <th><%= f.label :og_description %></th>
-    <td><%= f.text_area :og_description, size: '100x3' %></td>
-  </tr>
-  <tr>
-    <th><%= f.label :og_image %></th>
-    <td><%= f.text_field :og_image, style: 'width: 200px;' %></td>
-  </tr>
-</table>
+<%= render 'cms/admin/_partial/ogp/form', f: f, item: @item %>
 
 <p class="form">その他</p>
 

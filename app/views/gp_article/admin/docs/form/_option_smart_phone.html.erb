@@ -31,24 +31,7 @@
   <%= f.text_field :meta_keywords, style: 'width: 700px;' %>
 </div>
 
-<p class="form">OGP</p>
-
-<div>
-  <div class="label1"><%= f.label :og_type %></div>
-  <%= f.select :og_type, @item.class.og_type_options, include_blank: true %>
-</div>
-<div>
-  <div class="label1"><%= f.label :og_title %></div>
-  <%= f.text_field :og_title %>
-</div>
-<div>
-  <div class="label1"><%= f.label :og_description %></div>
-  <%= f.text_area :og_description, size: '100x3' %>
-</div>
-<div>
-  <div class="label1"><%= f.label :og_image %></div>
-  <%= f.text_field :og_image, style: 'width: 200px;' %>
-</div>
+<%= render 'cms/admin/_partial/ogp/form', f: f, item: @item %>
 
 <p class="form">その他</p>
 

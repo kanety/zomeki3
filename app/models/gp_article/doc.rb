@@ -10,6 +10,7 @@ class GpArticle::Doc < ApplicationRecord
   include Cms::Model::Rel::Content
   include Cms::Model::Rel::Inquiry
   include Cms::Model::Rel::Map
+  include Cms::Model::Rel::Ogp
   include Cms::Model::Rel::Bracket
   include Cms::Model::Rel::Link
   include Cms::Model::Rel::PublishUrl
@@ -48,7 +49,6 @@ class GpArticle::Doc < ApplicationRecord
   enum_ish :target, ['', '_self', '_blank', 'attached_file'], default: ''
   enum_ish :event_state, [:visible, :hidden], default: :hidden
   enum_ish :marker_state, [:visible, :hidden], default: :hidden
-  enum_ish :og_type, [:article]
   enum_ish :feature_1, [true, false], default: true
 
   # Content

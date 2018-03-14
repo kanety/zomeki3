@@ -59,26 +59,7 @@
 
 <br />
 
-<p class="form">OGP</p>
-
-<table class="show">
-  <tr>
-    <th><%= @item.class.human_attribute_name :og_type %></th>
-    <td><%= @item.og_type_text %></td>
-  </tr>
-  <tr>
-    <th><%= @item.class.human_attribute_name :og_title %></th>
-    <td><%= @item.og_title %></td>
-  </tr>
-  <tr>
-    <th><%= @item.class.human_attribute_name :og_description %></th>
-    <td><%=simple_format @item.og_description %></td>
-  </tr>
-  <tr>
-    <th><%= @item.class.human_attribute_name :og_image %></th>
-    <td><%= @item.og_image %></td>
-  </tr>
-</table>
+<%= render 'cms/admin/_partial/ogp/view', item: @item %>
 
 <br />
 <p class="form">Basic認証</p>

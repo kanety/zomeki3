@@ -36,10 +36,10 @@ ja:
         portal_group_business_ids: 業種
         portal_group_attribute_ids: 属性
         portal_group_area_ids: 地域
-        og_type: タイプ
-        og_title: タイトル
-        og_description: 説明
-        og_image: 画像
+        og_type: DEPRECATED
+        og_title: DEPRECATED
+        og_description: DEPRECATED
+        og_image: DEPRECATED
         smart_phone_layout: スマートフォン表示設定
         smart_phone_publication: スマートフォンを別に書き出す
         spp_target: 書き出し対象
@@ -107,6 +107,12 @@ ja:
         smart_phone_head: スマートフォン HEADタグ
         smart_phone_body: スマートフォン BODYタグ
         smart_phone_stylesheet: スマートフォン スタイルシート
+
+      cms/ogp:
+        og_type: タイプ
+        title: タイトル
+        description: 説明
+        image: 画像
 
       cms/piece:
         concept_id: コンセプト

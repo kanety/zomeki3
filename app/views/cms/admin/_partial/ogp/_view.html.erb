@@ -1,0 +1,20 @@
+<p class="form">OGP</p>
+
+<table class="show">
+  <tr>
+    <th><%= Cms::Ogp.human_attribute_name :og_type %></th>
+    <td><%= item.ogp.og_type_text if item.ogp %></td>
+  </tr>
+  <tr>
+    <th><%= Cms::Ogp.human_attribute_name :title %></th>
+    <td><%= item.ogp.title if item.ogp %></td>
+  </tr>
+  <tr>
+    <th><%= Cms::Ogp.human_attribute_name :description %></th>
+    <td><%=simple_format item.ogp.description if item.ogp %></td>
+  </tr>
+  <tr>
+    <th><%= Cms::Ogp.human_attribute_name :image %><%=t "#{controller_path.tr('/', '.')}.ogp/image.comment", default: '' %></th>
+    <td><%= item.ogp.image if item.ogp %></td>
+  </tr>
+</table>

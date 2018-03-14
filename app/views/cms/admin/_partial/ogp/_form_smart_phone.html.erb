@@ -1,0 +1,21 @@
+<p class="form">OGP</p>
+
+<%- @item.build_ogp if @item.ogp.blank? -%>
+<%= f.fields_for :ogp do |f2| %>
+<div>
+  <div class="label1"><%= f2.label :og_type %></div>
+  <%= f2.select :og_type, f2.object.class.og_type_options, include_blank: true %>
+</div>
+<div>
+  <div class="label1"><%= f2.label :title %></div>
+  <%= f2.text_field :title %>
+</div>
+<div>
+  <div class="label1"><%= f2.label :description %></div>
+  <%= f2.text_area :description, size: '100x3' %>
+</div>
+<div>
+  <div class="label1"><%= f2.label :image %><%=t "#{controller_path.tr('/', '.')}.ogp/image.comment", default: '' %></div>
+  <%= f2.text_field :image, style: 'width: 200px;' %>
+</div>
+<%- end -%>

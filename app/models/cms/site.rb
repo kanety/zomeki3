@@ -3,11 +3,11 @@ class Cms::Site < ApplicationRecord
   include Sys::Model::Rel::Creator
   include Sys::Model::Auth::Manager
   include Cms::Model::Rel::SiteSetting
+  include Cms::Model::Rel::Ogp
 
   attribute :in_root_group_id, :integer
 
   enum_ish :state, [:public, :closed]
-  enum_ish :og_type, [:article, :product, :profile]
   enum_ish :smart_phone_layout, [:smart_phone, :pc], default: :smart_phone
   enum_ish :smart_phone_publication, [:no, :yes], default: :no
   enum_ish :spp_target, [:only_top, :all], default: :only_top

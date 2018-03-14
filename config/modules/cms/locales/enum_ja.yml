@@ -25,10 +25,6 @@ ja:
         visible: 表示
         hidden: 非表示
     cms/site:
-      og_type:
-        article: article
-        product: product
-        profile: profile
       smart_phone_layout:
         smart_phone: スマートフォンレイアウトを優先
         pc: PCレイアウトで表示
@@ -55,6 +51,11 @@ ja:
         success: ○
         failure: ×
         skip: －
+    cms/ogp:
+      og_type:
+        article: article
+        product: product
+        profile: profile
     cms/piece_link_item:
       target:
         '': 指定なし

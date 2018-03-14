@@ -10,7 +10,7 @@
   <%- if Page.current_item.try(:respond_to?, :meta_keywords) && (meta_keywords = Page.current_item.meta_keywords).present? -%>
   <meta name="keywords" content="<%= meta_keywords %>" />
   <%- end -%>
-  <%= og_tags(Page.current_item) %>
+  <%= og_tags(Page.current_item, Page.site) %>
 
   <%= javascript_include_tag '/_common/js/jquery.browser.js' %>
   <%= javascript_include_tag '/_common/js/jquery.iframe-auto-height.js' %>

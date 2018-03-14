@@ -1,6 +1,9 @@
 ja:
   gp_article:
     admin:
+      docs:
+        ogp/image:
+          comment: （添付ファイル）
       content:
         settings:
           menus:

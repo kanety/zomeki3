@@ -19,8 +19,6 @@ ja:
       marker_state:
         visible: 表示
         hidden: 非表示
-      og_type:
-        article: article
       feature_1:
         true: 表示
         false: 非表示
