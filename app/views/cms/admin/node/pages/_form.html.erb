@@ -106,6 +106,6 @@ function setText(element, text ) {
 
 <br /><p class="form">連絡先設定</p>
 <%= render 'cms/admin/_partial/inquiries/form', f: f, item: @item %>
-<%= task_form f %>
+<%= render 'task_form', f: f, item: @item %>
 <%= recognizer_form f %>
 <%= creator_form f %>

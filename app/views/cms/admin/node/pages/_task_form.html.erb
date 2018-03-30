@@ -1,6 +1,11 @@
 <p class="form">公開予約設定</p>
 
 <table class="show">
+  <tr>
+    <th>表示日時</th>
+    <td><%= f.text_field :published_at, value: l(f.object.published_at),
+                                        style: 'width: 150px;', class: 'datetimepicker' %></td>
+  </tr>
   <%= f.fields_for :tasks, f.object.task_for_form('publish') do |f2| %>
   <tr>
     <th>公開開始日時</th>
