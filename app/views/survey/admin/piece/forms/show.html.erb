@@ -4,7 +4,7 @@
 <table class="show">
   <tr>
     <th><%= @item.class.human_attribute_name :target_form_id %></th>
-    <td><%= "#{@item.target_form.title}（#{@item.target_form.name}）" if @item.target_form %></td>
+    <td><%= "#{@item.form.title}（#{@item.form.name}）" if @item.form %></td>
   </tr>
   <tr>
     <th><%= @item.class.human_attribute_name :head_css %></th>
