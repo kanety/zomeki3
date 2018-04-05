@@ -5,9 +5,13 @@
   </tr>
 </table>
 
-<br /><p class="form">広告バナー</p>
+<p class="form">広告バナー</p>
 
 <table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :state %></th>
+    <td><%= @item.state_text %></td>
+  </tr>
   <tr>
     <th><%= AdBanner::Group.model_name.human %></th>
     <td><%= @item.group.try(:title) %></td>
@@ -30,21 +34,9 @@
   </tr>
 </table>
 
-<br /><p class="form">詳細情報</p>
+<p class="form">詳細情報</p>
 
 <table class="show">
-  <tr>
-    <th><%= @item.class.human_attribute_name :state %></th>
-    <td><%= @item.state_text %></td>
-  </tr>
-  <tr>
-    <th><%= @item.class.human_attribute_name :published_at %></th>
-    <td><%=l @item.published_at %></td>
-  </tr>
-  <tr>
-    <th><%= @item.class.human_attribute_name :closed_at %></th>
-    <td><%=l @item.closed_at %></td>
-  </tr>
   <tr>
     <th><%= @item.class.human_attribute_name :url %></th>
     <td><%= link_to @item.url, @item.url, target: '_blank' %></td>
@@ -63,7 +55,9 @@
   </tr>
 </table>
 
-<br /><p class="form">業者情報</p>
+<%= task_view @item %>
+
+<p class="form">業者情報</p>
 
 <table class="show">
   <tr>

@@ -1,5 +1,6 @@
 class AdBanner::Admin::BannersController < Cms::Controller::Admin::Base
   include Sys::Controller::Scaffold::Base
+  include Sys::Controller::Scaffold::Publication
 
   def pre_dispatch
     @content = AdBanner::Content::Banner.find(params[:content])
@@ -8,16 +9,7 @@ class AdBanner::Admin::BannersController < Cms::Controller::Admin::Base
 
   def index
     items = @content.banners.except(:order).order(sort_no: :asc, created_at: :desc)
-
-    items = case params[:target]
-            when 'published'
-              items.published
-            when 'closed'
-              items.closed
-            else
-              items
-            end
-
+    items = items.where(state: params[:target]) if params[:target].present?
     @items = items.paginate(page: params[:page], per_page: params[:limit])
 
     _index @items
@@ -35,19 +27,29 @@ class AdBanner::Admin::BannersController < Cms::Controller::Admin::Base
   def create
     @item = @content.banners.build(banner_params)
     @item.site_id = Core.site.id
-    _create @item
+    @item.state = params.keys.detect { |k| k =~ /^commit_/ }.to_s.sub(/^commit_/, '')
+    _create @item do
+      @item.enqueue_tasks if @item.state == 'draft'
+      publish_or_close_images
+    end
   end
 
   def update
     @item = @content.banners.find(params[:id])
     @item.attributes = banner_params
+    @item.state = params.keys.detect { |k| k =~ /^commit_/ }.to_s.sub(/^commit_/, '')
     @item.skip_upload if @item.file.blank? && ::File.exist?(@item.upload_path)
-    _update @item
+    _update @item do
+      @item.enqueue_tasks if @item.state == 'draft'
+      publish_or_close_images
+    end
   end
 
   def destroy
     @item = @content.banners.find(params[:id])
-    _destroy @item
+    _destroy @item do
+      @item.close_images if @item.state == 'public'
+    end
   end
 
   def file_content
@@ -57,11 +59,20 @@ class AdBanner::Admin::BannersController < Cms::Controller::Admin::Base
 
   private
 
+  def publish_or_close_images
+    if @item.state == 'public'
+      @item.publish_images
+    else
+      @item.close_images
+    end
+  end
+
   def banner_params
     params.require(:item).permit(
       :advertiser_contact, :advertiser_email, :advertiser_name, :advertiser_phone,
-      :closed_at, :file, :group_id, :name, :published_at, :sort_no, :state, :title, :alt_text, :url, :sp_url, :target,
-      :creator_attributes => [:id, :group_id, :user_id]
+      :file, :group_id, :name, :sort_no, :state, :title, :alt_text, :url, :sp_url, :target,
+      :creator_attributes => [:id, :group_id, :user_id],
+      :tasks_attributes => [:id, :name, :process_at]
     )
   end
 end

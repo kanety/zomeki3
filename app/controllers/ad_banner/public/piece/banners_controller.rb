@@ -5,19 +5,21 @@ class AdBanner::Public::Piece::BannersController < Sys::Controller::Public::Base
   end
 
   def index
-    @banners = if @piece.groups.empty?
-                 @piece.banners.published
-               else
+    @banners = @piece.banners.where(state: 'public')
+
+    @banners = if @piece.groups.present?
                  if @piece.group
-                   @piece.group.banners.published
+                   @banners.where(group_id: @piece.group.id)
                  else
-                   @piece.banners.published.select {|b| b.group.nil? }
+                   @banners.where(group_id: nil)
                  end
+               else
+                 @banners
                end
 
     @banners = case @piece.sort.last
                when 'ordered'
-                 @banners.sort {|a, b| a.sort_no <=> b.sort_no }
+                 @banners.sort { |a, b| a.sort_no <=> b.sort_no }
                when 'random'
                  @banners.shuffle
                else

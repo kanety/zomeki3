@@ -2,6 +2,7 @@ class AdBanner::Banner < ApplicationRecord
   include Sys::Model::Base
   include Sys::Model::Base::File
   include Sys::Model::Rel::Creator
+  include Sys::Model::Rel::Task
   include Cms::Model::Rel::Content
   include Cms::Model::Auth::Content
 
@@ -9,7 +10,7 @@ class AdBanner::Banner < ApplicationRecord
 
   attribute :sort_no, :integer, default: 10
 
-  enum_ish :state, [:public, :closed], default: :public
+  enum_ish :state, [:draft, :public, :closed], default: :public
   enum_ish :target, [:_self, :_blank], default: :_self
 
   # Content
@@ -25,22 +26,11 @@ class AdBanner::Banner < ApplicationRecord
   validates :token, uniqueness: { scope: :content_id } 
 
   before_validation :set_token
+  before_save :set_published_at
+  before_save :set_closed_at
 
   after_save     Cms::Publisher::ContentCallbacks.new(belonged: true), if: :changed?
   before_destroy Cms::Publisher::ContentCallbacks.new(belonged: true)
-
-  scope :published, -> {
-    now = Time.now
-    where(arel_table[:state].eq('public')
-          .and(arel_table[:published_at].eq(nil).or(arel_table[:published_at].lteq(now))
-          .and(arel_table[:closed_at].eq(nil).or(arel_table[:closed_at].gt(now)))))
-  }
-  scope :closed, -> {
-    now = Time.now
-    where(arel_table[:state].eq('closed')
-          .or(arel_table[:published_at].gt(now))
-          .or(arel_table[:closed_at].lteq(now)))
-  }
 
   def image_uri
     return '' unless content.public_node
@@ -62,19 +52,28 @@ class AdBanner::Banner < ApplicationRecord
     "#{content.public_node.public_uri}#{token}"
   end
 
-  def published?
-    now = Time.now
-    (state == 'public') && (published_at.nil? || published_at <= now) && (closed_at.nil? || closed_at > now)
+  def publishable?
+    state != 'public'
   end
 
-  def closed?
-    !published?
+  def closable?
+    state == 'public'
   end
 
   private
 
   def set_token
     self.token ||= Util::String::Token.generate_unique_token(self.class, :token)
+  end
+
+  def set_published_at
+    task = tasks.detect(&:publish_task?)
+    self.published_at = task.process_at if task
+  end
+
+  def set_closed_at
+    task = tasks.detect(&:close_task?)
+    self.closed_at = task.process_at if task
   end
 
   # Override Sys::Model::Base::File#duplicated?
@@ -88,6 +87,22 @@ class AdBanner::Banner < ApplicationRecord
       define_model_callbacks :publish_files, :close_files
       after_publish_files Cms::FileTransferCallbacks.new([:image_path, :image_smart_phone_path], recursive: true)
       after_close_files Cms::FileTransferCallbacks.new([:image_path, :image_smart_phone_path], recursive: true)
+    end
+
+    def publish
+      self.state = 'public'
+      transaction do
+        save(validate: false)
+        publish_images
+      end
+    end
+
+    def close
+      self.state = 'closed'
+      transaction do
+        save(validate: false)
+        close_images
+      end
     end
 
     def publish_images
@@ -108,7 +123,6 @@ class AdBanner::Banner < ApplicationRecord
         paths << image_smart_phone_path if content.site.publish_for_smart_phone?
         paths.each do |path|
           FileUtils.rm path if ::File.exist?(path)
-          FileUtils.rmdir ::File.dirname(path)
         end
       end
     end

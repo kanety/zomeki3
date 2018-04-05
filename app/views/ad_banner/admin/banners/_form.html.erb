@@ -1,6 +1,6 @@
 <span class="note">※は必須項目です。</span>
 
-<br /><p class="form">広告バナー</p>
+<p class="form">広告バナー</p>
 
 <table class="show">
   <tr>
@@ -30,23 +30,9 @@
   </tr>
 </table>
 
-<br /><p class="form">詳細情報</p>
+<p class="form">詳細情報</p>
 
 <table class="show">
-  <tr>
-    <th><%= f.label :state %></th>
-    <td><%= f.collection_radio_buttons :state, @item.class.state_options, :last, :first %></td>
-  </tr>
-  <tr>
-    <th><%= f.label :published_at %></th>
-    <td><%= f.text_field :published_at, value: l(@item.published_at),
-                                        style: 'width: 150px;', class: 'datetimepicker' %></td>
-  </tr>
-  <tr>
-    <th><%= f.label :closed_at %></th>
-    <td><%= f.text_field :closed_at, value: l(@item.closed_at),
-                                     style: 'width: 150px;', class: 'datetimepicker' %></td>
-  </tr>
   <tr>
     <th><%= f.label :url %> <span class="note">※</span></th>
     <td><%= f.text_field :url, style: 'width: 400px;' %></td>
@@ -65,7 +51,9 @@
   </tr>
 </table>
 
-<br /><p class="form">業者情報</p>
+<%= task_form f %>
+
+<p class="form">業者情報</p>
 
 <table class="show">
   <tr>

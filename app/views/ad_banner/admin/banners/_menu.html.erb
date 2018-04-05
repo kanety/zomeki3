@@ -9,8 +9,13 @@
 
   <%- if action_name == 'index' -%>
     <span class="separator"></span>
-    <%= link_to "すべて", { content: @content }, class: "#{'current' if params[:target].blank? }" %>
-    <%= link_to '公開期間中', { content: @content, target: 'published' }, class: "#{'current' if params[:target] == 'published' }" %>
-    <%= link_to '公開期間外', { content: @content, target: 'closed' }, class: "#{'current' if params[:target] == 'closed' }" %>
+    <%= link_to 'すべて', { content: @content }, class: "#{'current' if params[:target].blank? }" %>
+    <%= link_to '下書き', { content: @content, target: 'draft' }, class: "#{'current' if params[:target] == 'draft' }" %>
+    <%= link_to '公開中', { content: @content, target: 'public' }, class: "#{'current' if params[:target] == 'public' }" %>
+    <%= link_to '非公開', { content: @content, target: 'closed' }, class: "#{'current' if params[:target] == 'closed' }" %>
+  <%- end -%>
+  <%- if action_name == 'show' -%>
+    <%= link_to '公開', { do: :publish }, confirm: '公開してよろしいですか？' if @item.state != 'public' %>
+    <%= link_to '非公開', { do: :close }, confirm: '非公開にしてよろしいですか？' if @item.state == 'public' %>
   <%- end -%>
 </div>
