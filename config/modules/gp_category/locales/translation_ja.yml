@@ -59,10 +59,11 @@ ja:
         list_style: 表示形式
         date_style: 日付形式
       gp_category/piece/category_list:
-        setting_state: 詳細設定
+        setting_state: 表示カテゴリ指定
         category_type_id: 表示カテゴリ種別
         category_id: 表示カテゴリ
         layer: 表示カテゴリ階層
+        base_level: 基準
       gp_category/piece/category:
         in_settings_category_type_id: 表示カテゴリ種別
         in_settings_num_docs_visibility: 記事数表示

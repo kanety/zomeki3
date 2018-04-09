@@ -14,7 +14,11 @@
   </tr>
   <tr>
     <th><%= f.label :layer %></th>
-    <td colspan="3"><%= f.array_radio_buttons  'in_settings[layer]', @item.class::LAYER_OPTIONS %></td>
+    <td colspan="3"><%= f.array_radio_buttons 'in_settings[layer]', @item.class::LAYER_OPTIONS %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :base_level %></th>
+    <td colspan="3"><%= f.array_radio_buttons 'in_settings[base_level]', @item.class::BASE_LEVEL_OPTIONS %></td>
   </tr>
 </table>
 

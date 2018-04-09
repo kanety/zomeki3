@@ -1,13 +1,20 @@
 class GpCategory::Piece::CategoryList < Cms::Piece
   LAYER_OPTIONS = [['下層のカテゴリすべて', 'descendants'], ['該当カテゴリのみ', 'self']]
+  BASE_LEVEL_OPTIONS = [['子階層', 'child'], ['同階層', 'self']]
   SETTING_OPTIONS = [['無効', 'disabled'], ['有効', 'enabled']]
 
   default_scope { where(model: 'GpCategory::CategoryList') }
 
   belongs_to :content, class_name: 'GpCategory::Content::CategoryType'
 
+  after_initialize :set_default_settings
+
   def layer
     setting_value(:layer).presence || LAYER_OPTIONS.first.last
+  end
+
+  def base_level
+    setting_value(:base_level).presence || BASE_LEVEL_OPTIONS.first.last
   end
 
   def setting_state
@@ -73,5 +80,15 @@ class GpCategory::Piece::CategoryList < Cms::Piece
       category_ids = (doc.respond_to?(:category_ids) ? doc.category_ids : doc.categories.map(&:id))
       !(category_ids & self.categories.map(&:id)).empty?
     end
+  end
+
+  private
+
+  def set_default_settings
+    settings = self.in_settings
+
+    settings['base_level'] = BASE_LEVEL_OPTIONS.first.last if setting_value(:base_level).nil?
+
+    self.in_settings = settings
   end
 end

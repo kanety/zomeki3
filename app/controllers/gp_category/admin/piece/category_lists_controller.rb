@@ -21,6 +21,6 @@ class GpCategory::Admin::Piece::CategoryListsController < Cms::Admin::Piece::Bas
   private
 
   def base_params_item_in_settings
-    [:category_id, :category_type_id, :layer, :setting_state]
+    [:category_id, :category_type_id, :layer, :base_level, :setting_state]
   end
 end

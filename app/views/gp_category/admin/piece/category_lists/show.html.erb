@@ -16,5 +16,9 @@
     <th><%= @item.class.human_attribute_name :layer %></th>
     <td colspan="3"><%= @item.class::LAYER_OPTIONS.detect{|lo| lo.last == @item.setting_value(:layer) }.try(:first) %></td>
   </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :base_level %></th>
+    <td colspan="3"><%= @item.class::BASE_LEVEL_OPTIONS.detect{|lo| lo.last == @item.setting_value(:base_level) }.try(:first) %></td>
+  </tr>
 </table>
 <%- end -%>
