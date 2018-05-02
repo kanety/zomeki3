@@ -9,6 +9,8 @@ class GpCalendar::Public::Node::BaseController < GpCalendar::Public::NodeControl
 
     return http_error(404) unless validate_date
 
+    @specified_category = find_category_by_specified_path(@content, params[:escaped_category])
+
     # These params are used in pieces
     params[:gp_calendar_event_date]     = @date
     params[:gp_calendar_event_min_date] = @min_date
@@ -36,27 +38,11 @@ class GpCalendar::Public::Node::BaseController < GpCalendar::Public::NodeControl
     end
   end
 
-  def merge_docs_into_events(docs, events)
-    docs = GpArticle::DocsPreloader.new(docs).preload(:public_node_ancestors, :event_categories, :files)
-    merged = events + docs.map { |doc| GpCalendar::Event.from_doc(doc, @content) }
-    merged.sort_by { |e| e.started_on || Time.new(0) }
-  end
-
-  def find_category_by_specified_path(path)
-    return nil unless path.kind_of?(String)
-    category_type_name, category_path = path.split('/', 2)
-    category_type = @content.category_types.find_by(name: category_type_name)
-    return nil unless category_type
+  def find_category_by_specified_path(content, path)
+    return if path.blank?
+    category_type_name, category_path = path.gsub('@', '/').split('/', 2)
+    category_type = content.category_types.find_by(name: category_type_name)
+    return unless category_type
     category_type.find_category_by_path_from_root_category(category_path)
-  end
-
-  def filter_events_by_specified_category(events)
-    path = params[:category] ? params[:category] : params[:escaped_category].to_s.gsub('@', '/')
-    if (category = find_category_by_specified_path(path))
-      @events.reject! do |e|
-        next true unless e.respond_to?(:category_ids)
-        (e.category_ids & category.public_descendants.map(&:id)).empty?
-      end
-    end
   end
 end

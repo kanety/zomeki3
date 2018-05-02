@@ -1,6 +1,7 @@
-class GpCalendar::Public::Piece::DailyLinksController < GpCalendar::Public::Piece::BaseController
+class GpCalendar::Public::Piece::DailyLinksController < GpCalendar::Public::PieceController
   def pre_dispatch
     @piece = GpCalendar::Piece::DailyLink.find(Page.current_piece.id)
+    @content = @piece.content
     @item = Page.current_item
   end
 
@@ -27,15 +28,15 @@ class GpCalendar::Public::Piece::DailyLinksController < GpCalendar::Public::Piec
     @calendar.month_uri = "#{@node.public_uri}:year/:month/"
     @calendar.day_uri   = "#{@node.public_uri}:year/:month/#day:day"
 
-    docs = @piece.content.event_docs(start_date, end_date)
+    events = @content.public_events.scheduled_between(start_date, end_date)
+    docs = @content.event_docs.event_scheduled_between(start_date, end_date)
+
     days = docs.inject([]) do |dates, doc|
              dates | (doc.event_started_on..doc.event_ended_on).to_a
            end
 
-    events = @piece.content.events.public_state.scheduled_between(start_date, end_date)
-
     (start_date..end_date).each do |date|
-      if events.detect {|e| e.started_on <= date && date <= e.ended_on }
+      if events.detect { |e| e.started_on <= date && date <= e.ended_on }
         days << date unless days.include?(date)
       end
     end

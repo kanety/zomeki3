@@ -126,23 +126,18 @@ class GpArticle::Doc < ApplicationRecord
   scope :public_state, -> { where(state: 'public') }
   scope :mobile, ->(m) { m ? where(terminal_mobile: true) : where(terminal_pc_or_smart_phone: true) }
   scope :visible_in_list, -> { where(feature_1: true) }
-  scope :event_scheduled_between, ->(start_date, end_date, category_ids = nil) {
-    rel = dates_intersects(:event_started_on, :event_ended_on, start_date.try(:beginning_of_day), end_date.try(:end_of_day))
-    rel = rel.categorized_into_all(category_ids, categorized_as: 'GpCalendar::Event') if category_ids.present?
-    rel
+  scope :event_scheduled_on, ->(date) { event_scheduled_between(date, date) }
+  scope :event_scheduled_between, ->(start_date, end_date) {
+    dates_intersects(:event_started_on, :event_ended_on, start_date.try(:beginning_of_day), end_date.try(:end_of_day))
   }
-  scope :categorized_into, ->(category_ids, categorized_as: 'GpArticle::Doc') {
-    cats = GpCategory::Categorization.arel_table
-    where(id: GpCategory::Categorization.select(:categorizable_id)
-                                        .where(cats[:categorized_as].eq(categorized_as))
-                                        .where(cats[:category_id].in(category_ids)))
-  }
-  scope :categorized_into_all, ->(category_ids, categorized_as: 'GpArticle::Doc') {
-    cats = GpCategory::Categorization.arel_table
-    category_ids.inject(all) do |rel, category_id|
-      rel.where(id: GpCategory::Categorization.select(:categorizable_id)
-                                              .where(cats[:categorized_as].eq(categorized_as))
-                                              .where(cats[:category_id].eq(category_id)))
+  scope :categorized_into, ->(category_ids, categorized_as: 'GpArticle::Doc', alls: false) {
+    cats = GpCategory::Categorization.select(:categorizable_id)
+                                     .where(categorized_as: categorized_as)
+                                     .where(categorizable_type: self.to_s)
+    if alls
+      category_ids.inject(all) { |rel, cid| rel.where(id: cats.where(category_id: cid)) }
+    else
+      where(id: cats.where(category_id: category_ids))
     end
   }
   scope :organized_into, ->(group_ids) {

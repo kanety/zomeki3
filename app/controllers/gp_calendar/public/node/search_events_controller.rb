@@ -2,8 +2,6 @@ class GpCalendar::Public::Node::SearchEventsController < GpCalendar::Public::Nod
   skip_after_action :render_public_layout, only: [:file_content]
 
   def index
-    http_error(404) if params[:page]
-
     @start_date = Date.parse(params[:start_date]) rescue nil || Date.today
     @end_date   = Date.parse(params[:end_date]) rescue nil || nil
     if params[:all] && params[:start_date].blank? && params[:end_date].blank?
@@ -12,24 +10,22 @@ class GpCalendar::Public::Node::SearchEventsController < GpCalendar::Public::Nod
     end
     @date =  @start_date.present? ? @start_date : Date.today
 
-    categories = params[:categories].present? ? params[:categories].values.reject(&:blank?) : []
-    criteria = {}
-    @events = GpCalendar::Event.public_state.content_and_criteria(@content, criteria).order(:started_on)
-      .scheduled_between(@start_date, @end_date)
-      .preload(:categories).to_a
-    categories.each do |category|
-      @events.reject! {|c| c.categories && !c.categories.map{|ct| ct.id.to_s }.include?(category) }
+    category_ids = params[:categories].to_h.values.reject(&:blank?)
+
+    events = @content.public_events.scheduled_between(@start_date, @end_date)
+    events = events.categorized_into(category_ids, alls: true) if category_ids.present?
+    events = events.order(:started_on).preload(:categories).to_a
+
+    docs = @content.event_docs.event_scheduled_between(@start_date, @end_date)
+    docs = docs.categorized_into(category_ids, categorized_as: 'GpCalendar::Event', alls: true) if category_ids.present?
+    docs = GpArticle::DocsPreloader.new(docs).preload(:public_node_ancestors, :event_categories, :files)
+
+    holidays = @content.public_holidays.where(kind: 'event').scheduled_between(@start_date, @end_date)
+    holidays.each do |holiday|
+      holiday.started_on = holiday.repeat? ? @date.year : holiday.date.year
     end
 
-    docs = @content.event_docs(@start_date, @end_date, categories)
-    @events = merge_docs_into_events(docs, @events)
-
-    @holidays = GpCalendar::Holiday.public_state.content_and_criteria(@content, criteria).where(kind: :event)
-    @holidays.each do |holiday|
-      holiday.started_on = @date.year
-      @events << holiday if holiday.started_on
-    end
-    @events.sort_by! { |e| e.started_on || Time.new(0) }
+    @events = sort_events(events + docs_to_events(@content, docs) + holidays)
   end
 
   def file_content
@@ -37,5 +33,4 @@ class GpCalendar::Public::Node::SearchEventsController < GpCalendar::Public::Nod
     file = @event.files.find_by!(name: "#{params[:basename]}.#{params[:extname]}")
     send_file file.upload_path, filename: file.name
   end
-
 end

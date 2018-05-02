@@ -2,14 +2,6 @@ class GpCalendar::Public::Node::EventsController < GpCalendar::Public::Node::Bas
   skip_after_action :render_public_layout, only: [:file_content]
 
   def index
-    http_error(404) if params[:page]
-
-    year_month = @year_only ? @date.strftime('%Y') : @date.strftime('%Y%m')
-
-    criteria = {year_month: year_month}
-    @events = GpCalendar::Event.public_state.content_and_criteria(@content, criteria).order(:started_on)
-      .preload(:categories).to_a
-
     start_date, end_date = if @year_only
                              boy = @date.beginning_of_year
                              boy = @min_date if @min_date > boy
@@ -19,17 +11,21 @@ class GpCalendar::Public::Node::EventsController < GpCalendar::Public::Node::Bas
                            else
                              [@date.beginning_of_month, @date.end_of_month]
                            end
-    docs = @content.event_docs(start_date, end_date)
-    @events = merge_docs_into_events(docs, @events)
 
-    @holidays = GpCalendar::Holiday.public_state.content_and_criteria(@content, criteria).where(kind: :event)
-    @holidays.each do |holiday|
-      holiday.started_on = @date.year
-      @events << holiday if holiday.started_on
+    events = @content.public_events.scheduled_between(start_date, end_date)
+    events = events.categorized_into(@specified_category.public_descendants_ids) if @specified_category
+    events = events.order(:started_on).preload(:categories)
+
+    docs = @content.event_docs.event_scheduled_between(start_date, end_date)
+    docs = docs.categorized_into(@specified_category.public_descendants_ids, categorized_as: 'GpCalendar::Event') if @specified_category
+    docs = GpArticle::DocsPreloader.new(docs).preload(:public_node_ancestors, :event_categories, :files)
+
+    holidays = @content.public_holidays.where(kind: 'event').scheduled_between(start_date, end_date)
+    holidays.each do |holiday|
+      holiday.started_on = holiday.repeat? ? @date.year : holiday.date.year
     end
-    @events.sort_by! { |e| e.started_on || Time.new(0) }
 
-    filter_events_by_specified_category(@events)
+    @events = sort_events(events + docs_to_events(@content, docs) + holidays)
   end
 
   def file_content
